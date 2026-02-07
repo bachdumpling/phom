@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Space_Grotesk } from "next/font/google";
+import { Unbounded } from "next/font/google";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const unbounded = Unbounded({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"]
+  weight: ["200", "300", "400", "500", "600", "700", "800", "900"]
 });
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi">
-      <body className={spaceGrotesk.className}>{children}</body>
+      <body className={unbounded.className}>{children}</body>
     </html>
   );
 }

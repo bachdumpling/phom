@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -46,6 +46,8 @@ type Session = {
 };
 
 type Screen = "home" | "session" | "summary";
+
+const STORAGE_KEY = "phom_sessions_v1";
 
 const DROP_CHAY_ID = "drop-chay";
 const placementDropId = (key: PlacementKey) => `placement-${key}`;
@@ -142,15 +144,55 @@ const computeGamePoints = (game: Game, players: Player[]) => {
       });
     }
   } else {
-    const hasChay = game.chay.length > 0;
-    const picks = [
-      game.placements.first,
-      game.placements.second,
-      game.placements.third,
-      game.placements.fourth
-    ];
-    const unique = new Set(picks.filter(Boolean));
-    if (!hasChay) {
+    const winner = game.placements.first;
+    const chaySet = new Set(game.chay.map((transfer) => transfer.from).filter(Boolean));
+    const hasChay = chaySet.size > 0;
+
+    if (hasChay) {
+      if (!winner) {
+        warnings.push("Cần chọn người thắng để tính cháy");
+      } else if (chaySet.has(winner)) {
+        warnings.push("Người thắng không thể bị cháy");
+      } else {
+        chaySet.forEach((playerId) => {
+          if (playerId === winner) {
+            return;
+          }
+          points[playerId] -= 4;
+          points[winner] += 4;
+        });
+
+        const second = game.placements.second;
+        const third = game.placements.third;
+
+        if (second && !chaySet.has(second) && second !== winner) {
+          points[second] -= 1;
+          points[winner] += 1;
+        }
+        if (third && !chaySet.has(third) && third !== winner && third !== second) {
+          points[third] -= 2;
+          points[winner] += 2;
+        }
+
+        const nonChay = players.map((player) => player.id).filter((id) => !chaySet.has(id));
+        if (nonChay.length >= 2 && (!second || second === winner || chaySet.has(second))) {
+          warnings.push("Thiếu người về nhì");
+        }
+        if (
+          nonChay.length >= 3 &&
+          (!third || third === winner || third === second || chaySet.has(third))
+        ) {
+          warnings.push("Thiếu người về ba");
+        }
+      }
+    } else {
+      const picks = [
+        game.placements.first,
+        game.placements.second,
+        game.placements.third,
+        game.placements.fourth
+      ];
+      const unique = new Set(picks.filter(Boolean));
       if (unique.size !== 4) {
         warnings.push("Chưa đủ xếp hạng 1-4");
       } else {
@@ -163,21 +205,6 @@ const computeGamePoints = (game: Game, players: Player[]) => {
   }
 
   game.anChot.forEach(applyTransfer);
-  if (!game.u && game.chay.length > 0) {
-    const winner = game.placements.first;
-    if (!winner) {
-      warnings.push("Cần chọn người thắng để tính cháy");
-    } else {
-      game.chay.forEach((transfer) => {
-        if (!transfer.from || transfer.from === winner) {
-          warnings.push("Cháy không hợp lệ");
-          return;
-        }
-        points[transfer.from] -= transfer.points;
-        points[winner] += transfer.points;
-      });
-    }
-  }
 
   const total = Object.values(points).reduce((sum, value) => sum + value, 0);
 
@@ -311,11 +338,67 @@ export default function Home() {
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editNames, setEditNames] = useState<string[]>(["", "", "", ""]);
   const [newSessionNames, setNewSessionNames] = useState<string[]>(["", "", "", ""]);
+  const [hydrated, setHydrated] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } })
   );
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        setHydrated(true);
+        return;
+      }
+      const parsed = JSON.parse(raw) as {
+        sessions?: Session[];
+        activeSessionId?: string | null;
+        screen?: Screen;
+      };
+      if (parsed.sessions && Array.isArray(parsed.sessions)) {
+        setSessions(parsed.sessions);
+      }
+      if (typeof parsed.activeSessionId !== "undefined") {
+        setActiveSessionId(parsed.activeSessionId);
+      }
+      if (parsed.screen) {
+        setScreen(parsed.screen);
+      }
+    } catch {
+      // ignore corrupted storage
+    } finally {
+      setHydrated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
+    if (activeSessionId && !sessions.find((session) => session.id === activeSessionId)) {
+      setActiveSessionId(null);
+      setScreen("home");
+    }
+  }, [activeSessionId, hydrated, sessions, screen]);
+
+  useEffect(() => {
+    if (!hydrated || typeof window === "undefined") {
+      return;
+    }
+    try {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ sessions, activeSessionId, screen })
+      );
+    } catch {
+      // ignore storage errors
+    }
+  }, [activeSessionId, hydrated, screen, sessions]);
 
   const activeSession = sessions.find((session) => session.id === activeSessionId) ?? null;
 
@@ -853,7 +936,7 @@ export default function Home() {
                         </div>
                         {currentGame.chay.length === 0 ? (
                           <p className="mt-2 text-xs text-muted">
-                            Kéo người chơi cháy vào đây (mỗi người -4, người thắng +4).
+                            Kéo người chơi cháy vào đây.
                           </p>
                         ) : (
                           <div className="mt-2 flex flex-wrap gap-2">
@@ -879,11 +962,6 @@ export default function Home() {
                         )}
                       </DropZone>
                     </div>
-                    {currentGame.chay.length > 0 ? (
-                      <p className="text-xs text-accent">
-                        Có cháy: bỏ qua điểm xếp hạng, chỉ tính chuyển 4 điểm.
-                      </p>
-                    ) : null}
                     {!currentGame.placements.first ? (
                       <p className="text-xs text-accent">
                         Cần chọn người thắng (1) để tính cháy.
