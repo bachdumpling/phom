@@ -1,11 +1,5 @@
 import type { Metadata } from "next";
-import { Unbounded } from "next/font/google";
 import "./globals.css";
-
-const unbounded = Unbounded({
-  subsets: ["latin"],
-  weight: ["200", "300", "400", "500", "600", "700", "800", "900"]
-});
 
 export const metadata: Metadata = {
   title: "Phỏm | Tính điểm",
@@ -19,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi">
-      <body className={unbounded.className}>{children}</body>
+      <body>{children}</body>
     </html>
   );
 }

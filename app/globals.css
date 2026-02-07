@@ -19,6 +19,7 @@
 body {
   background: var(--bg);
   color: var(--ink);
+  font-family: "Unbounded", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }

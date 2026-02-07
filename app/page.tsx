@@ -82,10 +82,10 @@ const createGame = (): Game => ({
   id: makeId(),
   u: false,
   placements: {
-    first: "p1",
-    second: "p2",
-    third: "p3",
-    fourth: "p4"
+    first: "",
+    second: "",
+    third: "",
+    fourth: ""
   },
   anChot: [],
   chay: []
@@ -294,8 +294,8 @@ const TrashButton = ({
     aria-label={label}
     disabled={disabled}
     onClick={onClick}
-    className={`flex h-8 w-8 items-center justify-center rounded-full border border-stroke text-ink transition-transform ${
-      disabled ? "opacity-40" : "active:scale-90"
+    className={`flex h-8 w-8 items-center justify-center rounded-md text-ink transition ${
+      disabled ? "opacity-40" : "hover:bg-black/5 active:scale-90"
     }`}
   >
     <svg
@@ -648,8 +648,27 @@ export default function Home() {
     <div className="min-h-screen bg-[var(--bg)]">
       <main className="mx-auto flex w-full max-w-md flex-col gap-6 px-5 pb-32 pt-10">
         <header className="space-y-3">
-          <div className="flex items-center gap-3">
-            {screen !== "home" ? (
+          {screen === "home" ? (
+            <>
+              <div className="flex items-center gap-3">
+                <span className="pill">PHỎM</span>
+              </div>
+              <h1 className="text-4xl font-semibold uppercase tracking-tight">Phiên</h1>
+            </>
+          ) : (
+            <div className="flex items-center justify-between gap-4">
+              <div className="space-y-1">
+                {activeSession ? (
+                  <p className="text-xs uppercase tracking-[0.35em] text-muted">
+                    {activeSession.name}
+                  </p>
+                ) : null}
+                <h1 className="text-3xl font-semibold uppercase tracking-tight">
+                  {screen === "session"
+                    ? `Ván ${activeSession ? activeSession.currentGameIndex + 1 : ""}`
+                    : "Tổng kết"}
+                </h1>
+              </div>
               <button
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-stroke bg-white text-sm font-semibold"
                 onClick={() => setMenuOpen(true)}
@@ -657,22 +676,8 @@ export default function Home() {
               >
                 ≡
               </button>
-            ) : null}
-            <span className="pill">PHỎM</span>
-            {screen === "session" && activeSession ? (
-              <span className="ml-auto text-xs font-semibold uppercase tracking-[0.35em] text-muted">
-                {activeSession.name}
-              </span>
-            ) : null}
-            {screen === "summary" && activeSession ? (
-              <span className="ml-auto text-xs font-semibold uppercase tracking-[0.35em] text-muted">
-                Tổng kết {activeSession.name}
-              </span>
-            ) : null}
-          </div>
-          <h1 className="text-4xl font-semibold uppercase tracking-tight">
-            {screen === "home" ? "Phiên" : screen === "session" ? "Ván" : "Tổng kết"}
-          </h1>
+            </div>
+          )}
         </header>
 
         {screen === "home" ? (
@@ -809,15 +814,10 @@ export default function Home() {
             onDragCancel={handleDragCancelEvent}
           >
             <section className="card p-5 space-y-5">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.35em] text-muted">
-                    Ván {String(activeSession.currentGameIndex + 1).padStart(2, "0")}
-                  </p>
-                  <h3 className="text-lg font-semibold">Kết quả ván</h3>
-                </div>
-                <div className="flex flex-col items-end gap-2">
-                  <label className="flex items-center gap-2 text-xs uppercase tracking-[0.2em]">
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="text-lg font-semibold">Kết quả</h3>
+                <div className="flex items-center gap-2">
+                  <label className="pill gap-2 text-[10px] font-semibold uppercase tracking-[0.2em]">
                     <span>Ù</span>
                     <input
                       type="checkbox"
@@ -867,9 +867,7 @@ export default function Home() {
               ) : (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <p className="text-xs uppercase tracking-[0.2em] text-muted">
-                      Kéo thả người chơi
-                    </p>
+                    <p className="text-xs uppercase tracking-[0.2em] text-muted">Người chơi</p>
                     <div className="flex flex-wrap gap-2">
                       {activeSession.players.map((player) => (
                         <DraggableChip
@@ -919,9 +917,7 @@ export default function Home() {
                                   onClick={() => clearPlacement(currentGame, key)}
                                 />
                               </div>
-                            ) : (
-                              <p className="mt-2 text-xs text-muted">Kéo vào đây</p>
-                            )}
+                            ) : null}
                           </DropZone>
                         );
                       })}
@@ -935,9 +931,7 @@ export default function Home() {
                           Cháy
                         </div>
                         {currentGame.chay.length === 0 ? (
-                          <p className="mt-2 text-xs text-muted">
-                            Kéo người chơi cháy vào đây.
-                          </p>
+                          <div className="mt-2 h-4" aria-hidden="true" />
                         ) : (
                           <div className="mt-2 flex flex-wrap gap-2">
                             {currentGame.chay.map((transfer) => {
@@ -983,12 +977,10 @@ export default function Home() {
                       }))
                     }
                   >
-                    + Thêm
+                    +
                   </button>
                 </div>
-                {currentGame.anChot.length === 0 ? (
-                  <p className="text-xs text-muted">Chưa có ăn chốt.</p>
-                ) : (
+                {currentGame.anChot.length === 0 ? null : (
                   <div className="space-y-3">
                     {currentGame.anChot.map((transfer) => (
                       <div key={transfer.id} className="rounded-2xl border border-stroke p-3">
@@ -1060,15 +1052,11 @@ export default function Home() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <p className="text-xs uppercase tracking-[0.2em] text-muted">Tổng ván</p>
-                  <span
-                    className={`pill ${
-                      currentSummary?.total === 0 ? "text-ink" : "text-accent"
-                    }`}
-                  >
-                    {currentSummary?.total === 0
-                      ? "Cân bằng"
-                      : `Lệch ${formatSigned(currentSummary?.total ?? 0)}`}
-                  </span>
+                  {currentSummary?.total ? (
+                    <span className="pill text-accent">
+                      {`Lệch ${formatSigned(currentSummary?.total ?? 0)}`}
+                    </span>
+                  ) : null}
                 </div>
                 {currentSummary?.warnings.length ? (
                   <p className="text-xs text-accent">
@@ -1116,11 +1104,11 @@ export default function Home() {
                 <h2 className="text-sm font-semibold uppercase tracking-[0.2em]">
                   Tổng phiên
                 </h2>
-                <span className={`pill ${sessionBalance === 0 ? "text-ink" : "text-accent"}`}>
-                  {sessionBalance === 0
-                    ? "Cân bằng"
-                    : `Lệch ${formatSigned(sessionBalance)}`}
-                </span>
+                {sessionBalance ? (
+                  <span className="pill text-accent">
+                    {`Lệch ${formatSigned(sessionBalance)}`}
+                  </span>
+                ) : null}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {activeSession.players.map((player) => {
@@ -1177,6 +1165,12 @@ export default function Home() {
             <button
               className="card px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em]"
               onClick={() => {
+                if (
+                  typeof window !== "undefined" &&
+                  !window.confirm("Làm lại phiên? Kết quả hiện tại sẽ bị xóa.")
+                ) {
+                  return;
+                }
                 updateSession(activeSession.id, (session) => ({
                   ...session,
                   games: [createGame()],
@@ -1243,7 +1237,7 @@ export default function Home() {
         >
           <div className="absolute inset-0 bg-black/40" onClick={() => setMenuOpen(false)} />
           <div
-            className={`absolute left-5 top-16 w-64 rounded-3xl border border-stroke bg-white p-4 shadow-lg transition-all duration-200 ${
+            className={`absolute right-5 top-16 w-64 rounded-3xl border border-stroke bg-white p-4 shadow-lg transition-all duration-200 ${
               menuOpen ? "translate-y-0 scale-100" : "-translate-y-2 scale-95"
             }`}
           >
@@ -1260,9 +1254,7 @@ export default function Home() {
             </div>
             <div className="mt-4 flex flex-col gap-2">
               <button
-                className={`rounded-2xl border border-stroke px-4 py-3 text-left text-sm font-semibold uppercase tracking-[0.2em] ${
-                  screen === "home" ? "bg-ink text-white" : "text-ink"
-                }`}
+                className="rounded-2xl border border-stroke px-4 py-3 text-left text-sm font-semibold uppercase tracking-[0.2em] text-ink"
                 onClick={() => {
                   setScreen("home");
                   setMenuOpen(false);
