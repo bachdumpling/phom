@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f4f2ee;
+  --surface: #ffffff;
+  --ink: #111111;
+  --muted: #6b6b6b;
+  --accent: #ff6b00;
+  --accent-soft: rgba(255, 107, 0, 0.12);
+  --stroke: rgba(0, 0, 0, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+input,
+select,
+button {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(255, 107, 0, 0.2);
+}
+
+@layer components {
+  .card {
+    @apply rounded-[28px] border border-stroke bg-surface shadow-card;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-full border border-stroke bg-surface px-3 py-1 text-xs font-medium uppercase tracking-[0.2em];
+  }
+
+  .control {
+    @apply w-full rounded-2xl border border-stroke bg-white/90 px-3 py-2 text-sm font-medium text-ink outline-none transition focus:border-ink;
+  }
+
+  .ghost {
+    @apply rounded-full border border-stroke px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-ink transition hover:bg-black/5;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-stroke bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-ink;
+  }
+}
