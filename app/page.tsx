@@ -646,7 +646,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
-      <main className="mx-auto flex w-full max-w-md flex-col gap-6 px-5 pb-32 pt-10">
+      <main className="mx-auto flex w-full max-w-md flex-col gap-6 px-3 pb-20 pt-10">
         <header className="space-y-3">
           {screen === "home" ? (
             <>
@@ -843,25 +843,39 @@ export default function Home() {
               {currentGame.u ? (
                 <div className="space-y-2">
                   <p className="text-xs uppercase tracking-[0.2em] text-muted">Người Ù</p>
-                  <select
-                    className="control"
-                    value={currentGame.placements.first}
-                    onChange={(event) =>
-                      updateGame(currentGame.id, (current) => ({
-                        ...current,
-                        placements: {
-                          ...current.placements,
-                          first: event.target.value
-                        }
-                      }))
-                    }
-                  >
-                    {activeSession.players.map((player) => (
-                      <option key={player.id} value={player.id}>
-                        {player.name}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      className="control appearance-none pr-10"
+                      value={currentGame.placements.first}
+                      onChange={(event) =>
+                        updateGame(currentGame.id, (current) => ({
+                          ...current,
+                          placements: {
+                            ...current.placements,
+                            first: event.target.value
+                          }
+                        }))
+                      }
+                    >
+                      {activeSession.players.map((player) => (
+                        <option key={player.id} value={player.id}>
+                          {player.name}
+                        </option>
+                      ))}
+                    </select>
+                    <svg
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      className="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-muted"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </div>
                   <p className="text-xs text-muted">Ù: thắng +15, còn lại -5</p>
                 </div>
               ) : (
@@ -977,7 +991,19 @@ export default function Home() {
                       }))
                     }
                   >
-                    +
+                    <svg
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      className="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 5v14" />
+                      <path d="M5 12h14" />
+                    </svg>
                   </button>
                 </div>
                 {currentGame.anChot.length === 0 ? null : (
@@ -987,49 +1013,77 @@ export default function Home() {
                         <div className="grid grid-cols-2 gap-2">
                           <label className="space-y-2 text-[10px] uppercase tracking-[0.2em]">
                             <span className="text-muted">Người bị chốt</span>
-                            <select
-                              className="control text-[10px] font-semibold"
-                              value={transfer.from}
-                              onChange={(event) =>
-                                updateGame(currentGame.id, (current) => ({
-                                  ...current,
-                                  anChot: current.anChot.map((item) =>
-                                    item.id === transfer.id
-                                      ? { ...item, from: event.target.value }
-                                      : item
-                                  )
-                                }))
-                              }
-                            >
-                              {activeSession.players.map((player) => (
-                                <option key={player.id} value={player.id}>
-                                  {player.name}
-                                </option>
-                              ))}
-                            </select>
+                            <div className="relative">
+                              <select
+                                className="control appearance-none pr-10 text-[10px] font-semibold"
+                                value={transfer.from}
+                                onChange={(event) =>
+                                  updateGame(currentGame.id, (current) => ({
+                                    ...current,
+                                    anChot: current.anChot.map((item) =>
+                                      item.id === transfer.id
+                                        ? { ...item, from: event.target.value }
+                                        : item
+                                    )
+                                  }))
+                                }
+                              >
+                                {activeSession.players.map((player) => (
+                                  <option key={player.id} value={player.id}>
+                                    {player.name}
+                                  </option>
+                                ))}
+                              </select>
+                              <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                                className="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-muted"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.6"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="m6 9 6 6 6-6" />
+                              </svg>
+                            </div>
                           </label>
                           <label className="space-y-2 text-[10px] uppercase tracking-[0.2em]">
                             <span className="text-muted">Người ăn</span>
-                            <select
-                              className="control text-[10px] font-semibold"
-                              value={transfer.to}
-                              onChange={(event) =>
-                                updateGame(currentGame.id, (current) => ({
-                                  ...current,
-                                  anChot: current.anChot.map((item) =>
-                                    item.id === transfer.id
-                                      ? { ...item, to: event.target.value }
-                                      : item
-                                  )
-                                }))
-                              }
-                            >
-                              {activeSession.players.map((player) => (
-                                <option key={player.id} value={player.id}>
-                                  {player.name}
-                                </option>
-                              ))}
-                            </select>
+                            <div className="relative">
+                              <select
+                                className="control appearance-none pr-10 text-[10px] font-semibold"
+                                value={transfer.to}
+                                onChange={(event) =>
+                                  updateGame(currentGame.id, (current) => ({
+                                    ...current,
+                                    anChot: current.anChot.map((item) =>
+                                      item.id === transfer.id
+                                        ? { ...item, to: event.target.value }
+                                        : item
+                                    )
+                                  }))
+                                }
+                              >
+                                {activeSession.players.map((player) => (
+                                  <option key={player.id} value={player.id}>
+                                    {player.name}
+                                  </option>
+                                ))}
+                              </select>
+                              <svg
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                                className="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-muted"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.6"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="m6 9 6 6 6-6" />
+                              </svg>
+                            </div>
                           </label>
                         </div>
                         <div className="mt-2 flex justify-end text-xs">
