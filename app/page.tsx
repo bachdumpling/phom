@@ -969,7 +969,7 @@ export default function Home() {
                 <div className="flex items-center justify-between">
                   <p className="text-xs uppercase tracking-[0.2em] text-muted">Ăn chốt</p>
                   <button
-                    className="ghost"
+                    className="ghost inline-flex h-8 w-8 items-center justify-center px-0 py-0 text-base leading-none tracking-normal"
                     onClick={() =>
                       updateGame(currentGame.id, (current) => ({
                         ...current,
@@ -988,7 +988,7 @@ export default function Home() {
                           <label className="space-y-2 text-[10px] uppercase tracking-[0.2em]">
                             <span className="text-muted">Người bị chốt</span>
                             <select
-                              className="control"
+                              className="control text-[10px] font-semibold"
                               value={transfer.from}
                               onChange={(event) =>
                                 updateGame(currentGame.id, (current) => ({
@@ -1011,7 +1011,7 @@ export default function Home() {
                           <label className="space-y-2 text-[10px] uppercase tracking-[0.2em]">
                             <span className="text-muted">Người ăn</span>
                             <select
-                              className="control"
+                              className="control text-[10px] font-semibold"
                               value={transfer.to}
                               onChange={(event) =>
                                 updateGame(currentGame.id, (current) => ({
