@@ -444,6 +444,18 @@ export default function Home() {
     ? activeSession.games[activeSession.currentGameIndex]
     : undefined;
 
+  const availablePlayers = useMemo(() => {
+    if (!activeSession || !currentGame) {
+      return [] as Player[];
+    }
+    const takenPlayerIds = new Set<string>(
+      (Object.values(currentGame.placements) as string[])
+        .filter(Boolean)
+        .concat(currentGame.chay.map((transfer) => transfer.from).filter(Boolean))
+    );
+    return activeSession.players.filter((player) => !takenPlayerIds.has(player.id));
+  }, [activeSession, currentGame]);
+
   const gameSummaries = useMemo(() => {
     if (!activeSession) {
       return [] as ReturnType<typeof computeGamePoints>[];
@@ -883,7 +895,7 @@ export default function Home() {
                   <div className="space-y-2">
                     <p className="text-xs uppercase tracking-[0.2em] text-muted">Người chơi</p>
                     <div className="flex flex-wrap gap-2">
-                      {activeSession.players.map((player) => (
+                      {availablePlayers.map((player) => (
                         <DraggableChip
                           key={player.id}
                           dragId={`pool-${player.id}`}
